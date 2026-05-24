@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator - Jacobi Iteration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>Jacobi Iteration Calculator</h1>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/theory">Theory</a></li>
+                <li><a href="/example1">Example 1</a></li>
+                <li><a href="/example2">Example 2</a></li>
+                <li><a href="/calculator" class="active">Calculator</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <h1>Interactive Jacobi Iteration Calculator</h1>
+
+            <div class="grid grid-2 mt-4">
+                <!-- Input Section -->
+                <div class="card">
+                    <h2>Problem Setup</h2>
+                    
+                    <div class="form-group">
+                        <label for="matrixSize">Matrix Size (n):</label>
+                        <div style="display: flex; gap: 0.5em;">
+                            <input type="number" id="matrixSize" min="2" max="8" value="3" style="width: 100px;">
+                            <button onclick="updateMatrixSize()" class="btn">Update</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Coefficient Matrix A:</label>
+                        <div id="matrixInput" class="matrix-grid"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Constant Vector b:</label>
+                        <div id="vectorInput" class="matrix-grid"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tolerance">Tolerance (ε):</label>
+                        <input type="number" id="tolerance" value="1e-6" step="1e-7">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maxIterations">Max Iterations:</label>
+                        <input type="number" id="maxIterations" value="100" min="1" max="1000">
+                    </div>
+
+                    <button onclick="loadExample1()" class="btn btn-secondary w-100" style="margin-bottom: 0.5em;">Load Example 1</button>
+                    <button onclick="loadExample2()" class="btn btn-secondary w-100" style="margin-bottom: 0.5em;">Load Example 2</button>
+                    <button onclick="solveProblem()" class="btn w-100" style="margin-bottom: 0.5em;">Solve Problem</button>
+                    <button onclick="clearResults()" class="btn btn-outline w-100">Clear</button>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" style="display: none;">
+                    <div class="card">
+                        <h2>Results</h2>
+                        
+                        <div id="convergenceStatus"></div>
+                        
+                        <div class="form-group">
+                            <label>Solution Vector x:</label>
+                            <div class="solution-vector" id="solutionVector"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Convergence Info:</label>
+                            <div id="convergenceInfo"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Iteration Summary:</label>
+                            <table id="iterationTable">
+                                <thead>
+                                    <tr>
+                                        <th>Iteration</th>
+                                        <th>Residual</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="iterationBody">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="form-group">
+                            <button onclick="toggleDetails()" class="btn w-100">Show Detailed Steps</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Steps Section -->
+            <div id="detailedStepsSection" style="display: none;">
+                <h2 style="margin-top: 2em;">Detailed Iteration Steps</h2>
+                <div id="detailedSteps"></div>
+            </div>
+
+            <!-- Messages -->
+            <div id="alertContainer"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Jacobi Iteration Calculator | A Numerical Methods Educational Tool</p>
+    </footer>
+
+    <script>
+        // Initialize matrix grid on page load
+        window.addEventListener('load', function() {
+            updateMatrixSize();
+        });
+
+        function updateMatrixSize() {
+            const n = parseInt(document.getElementById('matrixSize').value);
+            
+            // Update matrix input
+            const matrixInput = document.getElementById('matrixInput');
+            matrixInput.innerHTML = '';
+            matrixInput.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+            
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'matrix-input';
+                    input.step = '0.1';
+                    input.id = `a${i}${j}`;
+                    input.value = i === j ? '10' : '1';
+                    matrixInput.appendChild(input);
+                }
+            }
+
+            // Update vector input
+            const vectorInput = document.getElementById('vectorInput');
+            vectorInput.innerHTML = '';
+            vectorInput.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+            
+            for (let i = 0; i < n; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'matrix-input';
+                input.step = '0.1';
+                input.id = `b${i}`;
+                input.value = '12';
+                vectorInput.appendChild(input);
+            }
+        }
+
+        function loadExample1() {
+            document.getElementById('matrixSize').value = 3;
+            updateMatrixSize();
+            
+            const matrix = [[10, 1, 1], [1, 10, 1], [1, 1, 10]];
+            const vector = [12, 12, 12];
+            
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    document.getElementById(`a${i}${j}`).value = matrix[i][j];
+                }
+                document.getElementById(`b${i}`).value = vector[i];
+            }
+        }
+
+        function loadExample2() {
+            document.getElementById('matrixSize').value = 4;
+            updateMatrixSize();
+            
+            const matrix = [[20, 1, 2, 1], [1, 15, -2, 1], [2, -2, 20, 2], [1, 1, 2, 12]];
+            const vector = [24, 15, 20, 16];
+            
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    document.getElementById(`a${i}${j}`).value = matrix[i][j];
+                }
+                document.getElementById(`b${i}`).value = vector[i];
+            }
+        }
+
+        function solveProblem() {
+            const n = parseInt(document.getElementById('matrixSize').value);
+            const tolerance = parseFloat(document.getElementById('tolerance').value);
+            const maxIterations = parseInt(document.getElementById('maxIterations').value);
+
+            // Get matrix
+            const matrix = [];
+            for (let i = 0; i < n; i++) {
+                const row = [];
+                for (let j = 0; j < n; j++) {
+                    row.push(parseFloat(document.getElementById(`a${i}${j}`).value) || 0);
+                }
+                matrix.push(row);
+            }
+
+            // Get vector
+            const vector = [];
+            for (let i = 0; i < n; i++) {
+                vector.push(parseFloat(document.getElementById(`b${i}`).value) || 0);
+            }
+
+            // Validate
+            if (matrix.some(row => row.some(val => isNaN(val)))) {
+                showAlert('Please enter valid numbers for all matrix elements', 'danger');
+                return;
+            }
+
+            // Send to server
+            showAlert('Solving...', 'info');
+            
+            fetch('/api/solve', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    matrix: matrix,
+                    vector: vector,
+                    tolerance: tolerance,
+                    max_iterations: maxIterations
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showAlert(`Error: ${data.error}`, 'danger');
+                    return;
+                }
+                displayResults(data, n);
+            })
+            .catch(error => {
+                showAlert(`Error: ${error.message}`, 'danger');
+            });
+        }
+
+        function displayResults(data, n) {
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.style.display = 'block';
+
+            // Convergence status
+            const convergenceStatus = document.getElementById('convergenceStatus');
+            if (data.converged) {
+                convergenceStatus.innerHTML = `<div class="convergence-indicator success">✓ Converged in ${data.iterations} iterations</div>`;
+            } else {
+                convergenceStatus.innerHTML = `<div class="convergence-indicator warning">⚠ Did not converge after ${data.iterations} iterations</div>`;
+            }
+
+            // Diagonal dominance
+            const diagMsg = data.diagonal_dominant 
+                ? '<p class="alert alert-success">✓ Matrix is diagonally dominant (convergence guaranteed)</p>'
+                : '<p class="alert alert-warning">⚠ Matrix is NOT diagonally dominant (convergence not guaranteed)</p>';
+            convergenceStatus.innerHTML += diagMsg;
+
+            // Solution vector
+            const solutionVector = document.getElementById('solutionVector');
+            let solVec = '$$x = \\begin{bmatrix} ';
+            for (let i = 0; i < n; i++) {
+                solVec += data.solution[i].toFixed(6);
+                if (i < n - 1) solVec += ' \\\\ ';
+            }
+            solVec += ' \\end{bmatrix}$$';
+            solutionVector.innerHTML = solVec;
+
+            // Convergence info
+            const convergenceInfo = document.getElementById('convergenceInfo');
+            let convInfo = `<ul style="margin-left: 1em;">`;
+            convInfo += `<li><strong>Iterations:</strong> ${data.iterations}</li>`;
+            convInfo += `<li><strong>Final Residual:</strong> ${data.final_residual.toExponential(2)}</li>`;
+            convInfo += `<li><strong>Status:</strong> ${data.converged ? 'Converged' : 'Did not converge'}</li>`;
+            convInfo += `</ul>`;
+            convergenceInfo.innerHTML = convInfo;
+
+            // Iteration table
+            const iterationBody = document.getElementById('iterationBody');
+            iterationBody.innerHTML = '';
+            data.steps.forEach(step => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${step.iteration}</td><td>${step.residual.toExponential(2)}</td>`;
+                iterationBody.appendChild(row);
+            });
+
+            // Store for detailed view
+            window.currentSolution = data;
+
+            // Refresh MathJax rendering
+            MathJax.typesetPromise().catch(err => console.log(err));
+
+            showAlert('Solution computed successfully!', 'success');
+        }
+
+        function toggleDetails() {
+            const section = document.getElementById('detailedStepsSection');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                displayDetailedSteps();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function displayDetailedSteps() {
+            if (!window.currentSolution) return;
+
+            const data = window.currentSolution;
+            const detailedSteps = document.getElementById('detailedSteps');
+            let html = '';
+
+            data.steps.slice(0, 10).forEach(step => {
+                html += `<div class="iteration-step">`;
+                html += `<div class="iteration-number">Iteration ${step.iteration}</div>`;
+                html += `<p><strong>Solution:</strong> $$ x^{(${step.iteration})} = [`;
+                html += step.solution.map(x => x.toFixed(6)).join(', ');
+                html += `]^T $$</p>`;
+                html += `<p><strong>Residual:</strong> $$ ||x^{(${step.iteration})} - x^{(${step.iteration-1})}||_\\infty = ${step.residual.toExponential(2)} $$</p>`;
+                html += `</div>`;
+            });
+
+            if (data.steps.length > 10) {
+                html += `<p class="text-muted" style="margin-top: 1em;">Showing first 10 iterations of ${data.steps.length} total.</p>`;
+            }
+
+            detailedSteps.innerHTML = html;
+            MathJax.typesetPromise().catch(err => console.log(err));
+        }
+
+        function clearResults() {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('detailedStepsSection').style.display = 'none';
+            document.getElementById('alertContainer').innerHTML = '';
+            window.currentSolution = null;
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = `alert-${type}`;
+            alertContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+        }
+
+        document.querySelectorAll('nav a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

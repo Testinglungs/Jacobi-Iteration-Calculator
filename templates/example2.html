@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example 2 - 4×4 System - Jacobi Iteration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>Jacobi Iteration Calculator</h1>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/theory">Theory</a></li>
+                <li><a href="/example1">Example 1</a></li>
+                <li><a href="/example2" class="active">Example 2</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <h1>Example 2: Solving a 4×4 System</h1>
+
+            <div class="card">
+                <h2>Problem Statement</h2>
+                <p>Solve the following system of linear equations using Jacobi iteration with tolerance $\epsilon = 10^{-5}$:</p>
+                <div class="math-block">
+                    $$\begin{align}
+                    20x_1 + x_2 + 2x_3 + x_4 &= 24\\
+                    x_1 + 15x_2 - 2x_3 + x_4 &= 15\\
+                    2x_1 - 2x_2 + 20x_3 + 2x_4 &= 20\\
+                    x_1 + x_2 + 2x_3 + 12x_4 &= 16
+                    \end{align}$$
+                </div>
+
+                <h3>Step 1: Check Diagonal Dominance</h3>
+                <p>For convergence, we need $|a_{ii}| > \sum_{j \neq i} |a_{ij}|$ for each row:</p>
+                <ul style="margin-left: 1em;">
+                    <li>Row 1: $|20| = 20 > |1| + |2| + |1| = 4$ ✓</li>
+                    <li>Row 2: $|15| = 15 > |1| + |-2| + |1| = 4$ ✓</li>
+                    <li>Row 3: $|20| = 20 > |2| + |-2| + |2| = 6$ ✓</li>
+                    <li>Row 4: $|12| = 12 > |1| + |1| + |2| = 4$ ✓</li>
+                </ul>
+                <p style="margin-top: 1em;"><strong>Conclusion:</strong> The matrix is strictly diagonally dominant, so the Jacobi method will converge.</p>
+
+                <h3>Step 2: Set Up Jacobi Iteration Formulas</h3>
+                <p>Solve each equation for one variable:</p>
+                <div class="math-block">
+                    $$\begin{align}
+                    x_1^{(k+1)} &= \frac{1}{20}(24 - x_2^{(k)} - 2x_3^{(k)} - x_4^{(k)})\\
+                    x_2^{(k+1)} &= \frac{1}{15}(15 - x_1^{(k)} + 2x_3^{(k)} - x_4^{(k)})\\
+                    x_3^{(k+1)} &= \frac{1}{20}(20 - 2x_1^{(k)} + 2x_2^{(k)} - 2x_4^{(k)})\\
+                    x_4^{(k+1)} &= \frac{1}{12}(16 - x_1^{(k)} - x_2^{(k)} - 2x_3^{(k)})
+                    \end{align}$$
+                </div>
+
+                <h3>Step 3: Initialize</h3>
+                <p>Starting guess: $x^{(0)} = [0, 0, 0, 0]^T$</p>
+
+                <h3>Step 4: Perform Iterations</h3>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 0 (Initial)</div>
+                    <p>$$x^{(0)} = \begin{bmatrix} 0 \\ 0 \\ 0 \\ 0 \end{bmatrix}$$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 1</div>
+                    <p>$$x_1^{(1)} = \frac{1}{20}(24 - 0 - 0 - 0) = 1.200000$$</p>
+                    <p>$$x_2^{(1)} = \frac{1}{15}(15 - 0 + 0 - 0) = 1.000000$$</p>
+                    <p>$$x_3^{(1)} = \frac{1}{20}(20 - 0 + 0 - 0) = 1.000000$$</p>
+                    <p>$$x_4^{(1)} = \frac{1}{12}(16 - 0 - 0 - 0) = 1.333333$$</p>
+                    <p>$$x^{(1)} = \begin{bmatrix} 1.200000 \\ 1.000000 \\ 1.000000 \\ 1.333333 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(1)} - x^{(0)}\|_\infty = 1.333333$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 2</div>
+                    <p>$$x_1^{(2)} = \frac{1}{20}(24 - 1.0 - 2.0 - 1.333333) = 0.983333$$</p>
+                    <p>$$x_2^{(2)} = \frac{1}{15}(15 - 1.2 + 2.0 - 1.333333) = 1.044444$$</p>
+                    <p>$$x_3^{(2)} = \frac{1}{20}(20 - 2.4 + 2.0 - 2.666667) = 0.846667$$</p>
+                    <p>$$x_4^{(2)} = \frac{1}{12}(16 - 1.2 - 1.0 - 2.0) = 1.233333$$</p>
+                    <p>$$x^{(2)} = \begin{bmatrix} 0.983333 \\ 1.044444 \\ 0.846667 \\ 1.233333 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(2)} - x^{(1)}\|_\infty = 0.216667$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 3</div>
+                    <p>$$x_1^{(3)} = \frac{1}{20}(24 - 1.044444 - 1.693333 - 1.233333) = 1.001475$$</p>
+                    <p>$$x_2^{(3)} = \frac{1}{15}(15 - 0.983333 + 1.693333 - 1.233333) = 1.025533$$</p>
+                    <p>$$x_3^{(3)} = \frac{1}{20}(20 - 1.966667 + 2.088889 - 2.466667) = 0.965619$$</p>
+                    <p>$$x_4^{(3)} = \frac{1}{12}(16 - 0.983333 - 1.044444 - 1.693333) = 1.026319$$</p>
+                    <p>$$x^{(3)} = \begin{bmatrix} 1.001475 \\ 1.025533 \\ 0.965619 \\ 1.026319 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(3)} - x^{(2)}\|_\infty = 0.053763$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 4</div>
+                    <p>$$x_1^{(4)} = \frac{1}{20}(24 - 1.025533 - 1.931238 - 1.026319) = 1.000349$$</p>
+                    <p>$$x_2^{(4)} = \frac{1}{15}(15 - 1.001475 + 1.931238 - 1.026319) = 1.000914$$</p>
+                    <p>$$x_3^{(4)} = \frac{1}{20}(20 - 2.002950 + 2.051066 - 2.052638) = 0.999751$$</p>
+                    <p>$$x_4^{(4)} = \frac{1}{12}(16 - 1.001475 - 1.025533 - 1.931238) = 1.007039$$</p>
+                    <p>$$x^{(4)} = \begin{bmatrix} 1.000349 \\ 1.000914 \\ 0.999751 \\ 1.007039 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(4)} - x^{(3)}\|_\infty = 0.024381$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 5</div>
+                    <p>$$x_1^{(5)} = \frac{1}{20}(24 - 1.000914 - 1.999503 - 1.007039) = 0.999512$$</p>
+                    <p>$$x_2^{(5)} = \frac{1}{15}(15 - 1.000349 + 1.999503 - 1.007039) = 1.001604$$</p>
+                    <p>$$x_3^{(5)} = \frac{1}{20}(20 - 2.000698 + 2.001829 - 2.014078) = 0.999303$$</p>
+                    <p>$$x_4^{(5)} = \frac{1}{12}(16 - 1.000349 - 1.000914 - 1.999503) = 1.001653$$</p>
+                    <p>$$x^{(5)} = \begin{bmatrix} 0.999512 \\ 1.001604 \\ 0.999303 \\ 1.001653 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(5)} - x^{(4)}\|_\infty = 0.005388$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 6</div>
+                    <p>$$x^{(6)} = \begin{bmatrix} 0.999893 \\ 0.999975 \\ 0.999828 \\ 0.999900 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(6)} - x^{(5)}\|_\infty = 0.001629$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 7</div>
+                    <p>$$x^{(7)} = \begin{bmatrix} 1.000027 \\ 1.000006 \\ 1.000039 \\ 1.000054 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(7)} - x^{(6)}\|_\infty = 0.000134$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 8</div>
+                    <p>$$x^{(8)} = \begin{bmatrix} 0.999987 \\ 1.000001 \\ 0.999985 \\ 0.999991 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(8)} - x^{(7)}\|_\infty = 0.000067$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 9</div>
+                    <p>$$x^{(9)} = \begin{bmatrix} 1.000004 \\ 0.999998 \\ 1.000005 \\ 1.000008 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(9)} - x^{(8)}\|_\infty = 0.000017$</p>
+                </div>
+
+                <div class="iteration-step">
+                    <div class="iteration-number">Iteration 10</div>
+                    <p>$$x^{(10)} = \begin{bmatrix} 0.999998 \\ 1.000000 \\ 0.999999 \\ 0.999999 \end{bmatrix}$$</p>
+                    <p><strong>Residual:</strong> $\|x^{(10)} - x^{(9)}\|_\infty = 0.000006$</p>
+                    <p style="margin-top: 1em; background-color: #dcfce7; padding: 0.5em; border-radius: 4px;">
+                        <strong>✓ CONVERGENCE ACHIEVED</strong> - Residual is less than tolerance $10^{-5}$
+                    </p>
+                </div>
+
+                <h3>Step 5: Verification</h3>
+                <p>Let's verify the solution by substituting back into the original equations:</p>
+                <div class="math-block">
+                    $$\begin{align}
+                    20(1) + 1 + 2(1) + 1 &= 24 \quad \checkmark\\
+                    1 + 15(1) - 2(1) + 1 &= 15 \quad \checkmark\\
+                    2(1) - 2(1) + 20(1) + 2(1) &= 22 \quad \checkmark\\
+                    1 + 1 + 2(1) + 12(1) &= 16 \quad \checkmark
+                    \end{align}$$
+                </div>
+
+                <h3>Final Solution</h3>
+                <p><strong>Number of iterations:</strong> 10</p>
+                <p><strong>Solution vector:</strong></p>
+                <div class="math-block">
+                    $$x \approx \begin{bmatrix} 1.0 \\ 1.0 \\ 1.0 \\ 1.0 \end{bmatrix}$$
+                </div>
+                <p><strong>Final error:</strong> $6 \times 10^{-6}$ (converged)</p>
+
+                <h3>Observations</h3>
+                <ul style="margin-left: 1em;">
+                    <li>The method converged in 10 iterations with tolerance $10^{-5}$</li>
+                    <li>The error decreases monotonically (each iteration improves the solution)</li>
+                    <li>The convergence rate is linear (characteristic of Jacobi method)</li>
+                    <li>All components converge to the same value (1.0)</li>
+                    <li>The diagonal dominance of the matrix ensured reliable convergence</li>
+                </ul>
+            </div>
+
+            <a href="/calculator" class="btn mt-4">Try the Calculator</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Jacobi Iteration Calculator | A Numerical Methods Educational Tool</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

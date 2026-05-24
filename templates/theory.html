@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theory - Jacobi Iteration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>Jacobi Iteration Calculator</h1>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/theory" class="active">Theory</a></li>
+                <li><a href="/example1">Example 1</a></li>
+                <li><a href="/example2">Example 2</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <h1>Mathematical Theory of Jacobi Iteration</h1>
+
+            <div class="card">
+                <h2>Problem Formulation</h2>
+                <p>We want to solve a system of linear equations:</p>
+                <div class="math-block">
+                    $$Ax = b$$
+                </div>
+                <p>Where:</p>
+                <ul style="margin-left: 1em;">
+                    <li>$$A \in \mathbb{R}^{n \times n}$$ is a square coefficient matrix</li>
+                    <li>$$x \in \mathbb{R}^n$$ is the unknown solution vector</li>
+                    <li>$$b \in \mathbb{R}^n$$ is the constant (right-hand side) vector</li>
+                </ul>
+                
+                <p style="margin-top: 1.5em;">In expanded form, the system is:</p>
+                <div class="math-block">
+                    $$\begin{align}
+                    a_{11}x_1 + a_{12}x_2 + \cdots + a_{1n}x_n &= b_1\\
+                    a_{21}x_1 + a_{22}x_2 + \cdots + a_{2n}x_n &= b_2\\
+                    &\vdots\\
+                    a_{n1}x_1 + a_{n2}x_2 + \cdots + a_{nn}x_n &= b_n
+                    \end{align}$$
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Jacobi Iteration Method</h2>
+                <p>The Jacobi method is an <strong>iterative method</strong> that solves the system by repeatedly refining an approximate solution.</p>
+
+                <h3>Iteration Formula</h3>
+                <p>For the $i$-th equation, we solve for $x_i$:</p>
+                <div class="math-block">
+                    $$a_{ii}x_i = b_i - \sum_{j \neq i} a_{ij}x_j$$
+                </div>
+                
+                <p>Dividing by $a_{ii}$ (assuming it's non-zero):</p>
+                <div class="math-block">
+                    $$x_i = \frac{1}{a_{ii}}\left(b_i - \sum_{j \neq i} a_{ij}x_j\right)$$
+                </div>
+
+                <p style="margin-top: 1.5em;">The <strong>Jacobi iteration</strong> computes a new approximation using the <strong>previous iteration's values</strong>:</p>
+                <div class="math-block">
+                    $$x_i^{(k+1)} = \frac{1}{a_{ii}}\left(b_i - \sum_{j \neq i} a_{ij}x_j^{(k)}\right), \quad i = 1, 2, \ldots, n$$
+                </div>
+
+                <p style="margin-top: 1.5em;">Where:</p>
+                <ul style="margin-left: 1em;">
+                    <li>$x_i^{(k)}$ is the $i$-th component of the $k$-th iteration</li>
+                    <li>$x_i^{(k+1)}$ is the updated value in the next iteration</li>
+                    <li>$x_i^{(0)}$ is the initial guess (usually zero)</li>
+                </ul>
+
+                <h3>Matrix Form</h3>
+                <p>The method can be expressed in matrix form by decomposing $A = D - L - U$, where:</p>
+                <ul style="margin-left: 1em;">
+                    <li>$D$ is the diagonal matrix of diagonal elements</li>
+                    <li>$L$ is the lower triangular part (excluding diagonal)</li>
+                    <li>$U$ is the upper triangular part (excluding diagonal)</li>
+                </ul>
+
+                <p style="margin-top: 1em;">The iteration becomes:</p>
+                <div class="math-block">
+                    $$x^{(k+1)} = D^{-1}(L + U)x^{(k)} + D^{-1}b$$
+                </div>
+
+                <p style="margin-top: 1em;">Or equivalently:</p>
+                <div class="math-block">
+                    $$x^{(k+1)} = D^{-1}b + D^{-1}(L + U)x^{(k)}$$
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Convergence Conditions</h2>
+
+                <h3>Diagonal Dominance</h3>
+                <p>A sufficient condition for convergence is <strong>diagonal dominance</strong>:</p>
+                <div class="math-block">
+                    $$|a_{ii}| > \sum_{j \neq i} |a_{ij}| \quad \text{for all } i = 1, 2, \ldots, n$$
+                </div>
+
+                <p style="margin-top: 1em;">This means the absolute value of each diagonal element must be <strong>strictly greater</strong> than the sum of absolute values of the other elements in that row.</p>
+
+                <h3>Convergence Rate</h3>
+                <p>The convergence behavior depends on the spectral radius $\rho(G)$ of the iteration matrix $G = D^{-1}(L + U)$:</p>
+                <ul style="margin-left: 1em;">
+                    <li>If $\rho(G) < 1$, the method converges for any initial guess</li>
+                    <li>If $\rho(G) > 1$, the method diverges (error grows)</li>
+                    <li>If $\rho(G) = 1$, convergence is inconclusive</li>
+                </ul>
+
+                <p style="margin-top: 1em;"><strong>Note:</strong> Diagonal dominance guarantees $\rho(G) < 1$, ensuring convergence.</p>
+            </div>
+
+            <div class="card">
+                <h2>Stopping Criteria</h2>
+                <p>The iteration continues until one of these conditions is met:</p>
+
+                <h3>Absolute Error</h3>
+                <div class="math-block">
+                    $$\|x^{(k+1)} - x^{(k)}\|_\infty < \epsilon$$
+                </div>
+                <p>where $\epsilon$ is a specified tolerance (e.g., $10^{-6}$).</p>
+
+                <h3>Relative Error</h3>
+                <div class="math-block">
+                    $$\frac{\|x^{(k+1)} - x^{(k)}\|_\infty}{\|x^{(k+1)}\|_\infty} < \epsilon$$
+                </div>
+
+                <h3>Maximum Iterations</h3>
+                <p>Stop after a maximum number of iterations (e.g., 100) to prevent infinite loops.</p>
+            </div>
+
+            <div class="card">
+                <h2>Advantages and Disadvantages</h2>
+
+                <h3>Advantages</h3>
+                <ul style="margin-left: 1em;">
+                    <li>Simple to implement and understand</li>
+                    <li>Highly parallelizable (each variable can be updated independently)</li>
+                    <li>Efficient for sparse matrices (many zero elements)</li>
+                    <li>Requires minimal memory compared to direct methods</li>
+                </ul>
+
+                <h3>Disadvantages</h3>
+                <ul style="margin-left: 1em;">
+                    <li>May converge slowly (large number of iterations needed)</li>
+                    <li>Convergence not guaranteed without diagonal dominance</li>
+                    <li>Requires non-zero diagonal elements</li>
+                    <li>Less accurate for ill-conditioned matrices</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>Comparison with Other Methods</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Type</th>
+                            <th>Convergence</th>
+                            <th>Parallelizable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Jacobi</td>
+                            <td>Iterative</td>
+                            <td>Slow</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Gauss-Seidel</td>
+                            <td>Iterative</td>
+                            <td>Faster than Jacobi</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td>Gaussian Elimination</td>
+                            <td>Direct</td>
+                            <td>Exact (finite steps)</td>
+                            <td>Limited</td>
+                        </tr>
+                        <tr>
+                            <td>Conjugate Gradient</td>
+                            <td>Iterative</td>
+                            <td>Very fast (SPD matrices)</td>
+                            <td>Yes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Jacobi Iteration Calculator | A Numerical Methods Educational Tool</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

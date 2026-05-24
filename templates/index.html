@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jacobi Iteration - Numerical Methods Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>Jacobi Iteration Calculator</h1>
+            <ul>
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/theory">Theory</a></li>
+                <li><a href="/example1">Example 1</a></li>
+                <li><a href="/example2">Example 2</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <h1>Welcome to the Jacobi Iteration Calculator</h1>
+            <p>A comprehensive tool for understanding and solving systems of linear equations using the Jacobi iteration method.</p>
+
+            <div class="grid grid-2 mt-4">
+                <div class="card">
+                    <div class="card-title">📚 Learn the Theory</div>
+                    <p>Understand the mathematical principles behind the Jacobi iteration method, including convergence conditions and iterative formulas.</p>
+                    <a href="/theory" class="btn">View Theory</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📝 Worked Examples</div>
+                    <p>Follow step-by-step solutions of two complete examples: a 3×3 system and a 4×4 system with detailed calculations.</p>
+                    <div class="flex mt-2">
+                        <a href="/example1" class="btn">Example 1 (3×3)</a>
+                        <a href="/example2" class="btn btn-secondary">Example 2 (4×4)</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🔧 Interactive Calculator</div>
+                    <p>Enter your own coefficient matrix and constant vector, then watch as the calculator solves your system and displays each iteration step.</p>
+                    <a href="/calculator" class="btn">Open Calculator</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">💡 Key Features</div>
+                    <ul style="margin-left: 1em;">
+                        <li>Diagonal dominance checking</li>
+                        <li>Convergence monitoring</li>
+                        <li>Step-by-step iteration display</li>
+                        <li>Customizable tolerance and max iterations</li>
+                        <li>Mathematical notation with MathJax</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-4" style="background-color: #f0f9ff;">
+                <h3>What is Jacobi Iteration?</h3>
+                <p>The Jacobi iteration is an iterative method for solving systems of linear equations of the form $$Ax = b$$, where:
+                <ul style="margin-left: 1em; margin-top: 1em;">
+                    <li>$$A$$ is an $$n \times n$$ coefficient matrix</li>
+                    <li>$$x$$ is the unknown vector</li>
+                    <li>$$b$$ is the constant vector</li>
+                </ul>
+                </p>
+                <p>Unlike direct methods (like Gaussian elimination), the Jacobi method uses <strong>iteration</strong> to progressively refine an approximate solution. Starting from an initial guess (usually zero), each iteration computes a new approximation by solving each equation for one variable using the previous iteration's values for the other variables.</p>
+                <p style="margin-top: 1.5em;">The method is particularly useful for:</p>
+                <ul style="margin-left: 1em;">
+                    <li>Large sparse systems (matrices with many zeros)</li>
+                    <li>Parallel and distributed computing</li>
+                    <li>Problems where direct methods are computationally expensive</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Jacobi Iteration Calculator | A Numerical Methods Educational Tool</p>
+        <p style="font-size: 0.9em; margin-top: 0.5em;">Created for understanding iterative solution methods</p>
+    </footer>
+
+    <script>
+        // Set active nav link
+        document.querySelectorAll('nav a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
